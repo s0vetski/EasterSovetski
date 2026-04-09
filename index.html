@@ -182,13 +182,6 @@
                 padding: 10px 16px;
                 font-size: 14px;
             }
-            .result-social p {
-                font-size: 12px;
-                margin: 10px 0;
-            }
-            .share-buttons {
-                gap: 8px;
-            }
         }
         
         #top-list {
@@ -248,16 +241,6 @@
         }
         .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #b45f1b; }
         .btn.hidden { display: none; }
-        .result-social { margin-top: 25px; padding-top: 15px; border-top: 2px dashed #ffb347; }
-        .result-social p { font-size: 18px; color: #a15505; margin: 0 0 15px 0; font-weight: bold; }
-        .share-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 10px; }
-        .share-btn { background: #4CAF50; box-shadow: 0 4px 0 #2e6b2f; min-width: 140px; }
-        .copy-btn { background: #2196F3; box-shadow: 0 4px 0 #0b5e7e; min-width: 140px; }
-        .share-btn img, .copy-btn img { width: 28px; height: 28px; vertical-align: middle; }
-        @media (max-width: 600px) {
-            .share-buttons { flex-direction: column; align-items: center; gap: 8px; }
-            .share-btn, .copy-btn { width: 80%; min-width: unset; justify-content: center; }
-        }
         .floating-message {
             position: absolute;
             font-size: 28px;
@@ -336,14 +319,6 @@
     <div class="chick">🐣🥚</div>
     <h1 id="leaderboard-title">ИГРА ОКОНЧЕНА!</h1>
     <div id="top-list">Загрузка ТОПа...</div>
-    <div class="result-social">
-        <p>📢 Поделитесь результатом в наших сообществах:</p>
-        <div class="share-buttons">
-            <a href="#" target="_blank" class="btn share-btn" id="shareTelegramBtn"><img src="tg.png" alt=""> Telegram</a>
-            <a href="#" target="_blank" class="btn share-btn" id="shareVkBtn"><img src="vk.png" alt=""> VK</a>
-            <button class="btn copy-btn" id="copyResultBtn"><img src="copy.png" alt=""> Копировать</button>
-        </div>
-    </div>
     <button class="btn" id="reload-btn" onclick="location.reload()">🐥 ИГРАТЬ СНОВА</button>
 </div>
 
@@ -537,7 +512,7 @@
             const data = await response.json();
             
             if (data.success && data.top && data.top.length > 0) {
-                let html = "<h3 style='margin:5px 0'>🏆 Топ-5 игроков 🏆</h3>";
+                let html = "<h3 style='margin:5px 0'>🏆 Топ игроков 🏆</h3>";
                 data.top.forEach((entry, index) => {
                     html += `<div class="entry"><span>${index+1}. ${escapeHtml(entry.name)}</span><b>${entry.score}</b></div>`;
                 });
@@ -604,38 +579,6 @@
         else reloadBtn.classList.add('hidden');
         document.getElementById('leaderboard-screen').style.display = 'block';
         getTopScoresFromBackend();
-        updateShareLinks();
-    }
-    
-    function getResultMessage() {
-        const gameUrl = window.location.href;
-        return `🐣 Пасхальный сбор 2026!\n👤 Игрок: ${finalPlayerName}\n🥚 Счёт: ${score}\n🔗 Попробуйте побить рекорд: ${gameUrl}`;
-    }
-    
-    async function copyResult() {
-        const text = getResultMessage();
-        try {
-            await navigator.clipboard.writeText(text);
-            showToast('✅ Результат скопирован!');
-        } catch (err) {
-            showToast('❌ Не удалось скопировать.');
-        }
-    }
-    
-    async function shareToVK() {
-        const text = getResultMessage();
-        await navigator.clipboard.writeText(text);
-        showToast('✅ Текст скопирован!');
-        window.open(`https://vk.com/sovetskiykzn`, '_blank');
-    }
-    
-    function updateShareLinks() {
-        const message = getResultMessage();
-        const encodedMessage = encodeURIComponent(message);
-        document.getElementById('shareTelegramBtn').href = `https://t.me/sovetskiy_kzn?text=${encodedMessage}`;
-        const vkBtn = document.getElementById('shareVkBtn');
-        vkBtn.removeEventListener('click', shareToVK);
-        vkBtn.addEventListener('click', (e) => { e.preventDefault(); shareToVK(); });
     }
     
     // ========== ИГРОВАЯ ЛОГИКА ==========
@@ -862,8 +805,6 @@
     window.addEventListener('touchmove', (e) => { if (gameActive) { e.preventDefault(); handleMove(e.touches[0].clientX); } });
     window.addEventListener('touchstart', (e) => { if (gameActive) { e.preventDefault(); handleMove(e.touches[0].clientX); } });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    
-    document.getElementById('copyResultBtn').addEventListener('click', copyResult);
     
     // Запуск игры
     if (isEventActive()) {
